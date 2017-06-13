@@ -163,6 +163,6 @@ clean::
 	$(RM) $(TOOLS)
 endef
 
-$(eval $(RULES))
+$(	eval $(RULES))
 
 -include $(wildcard $(OBJS:.o=.d) $(HOSTOBJS:.o=.d) $(TESTOBJS:.o=.d) $(HOBJS:.o=.d) $(SLIBOBJS:.o=.d)) $(OBJS:.o=$(DEFAULT_YASMD).d)
