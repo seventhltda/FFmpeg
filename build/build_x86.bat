@@ -1,10 +1,3 @@
-rem x86 build - Start
-pushd D:\FFmpeg
-set path=D:\FFmpeg\build\mingw32\msys\bin;D:\FFmpeg\build\mingw32\bin
-make distclean
-make clean
-sh --login -i "D:\FFmpeg\build\configure_ffmpeg.sh" x86
-make
-popd
-copy_ffmpeg.bat x86
-rem x86 build - End
+set MSYSTEM=MINGW32
+start /wait C:\msys64\usr\bin\mintty -l build_x86.log -d /usr/bin/bash --login -i D:\FFmpeg\build\configure_ffmpeg.sh x86
+exit

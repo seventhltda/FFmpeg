@@ -1,7 +1,10 @@
 # Navigate to the project workspace (FFmpeg root source directory) and configure FFmpeg
 cd "D:/FFmpeg/"
 
-ldflags="-static-libgcc"
+make distclean
+make clean
+
+ldflags="-static"
 
 flags="--disable-everything --disable-debug --pkg-config=pkg-config"
 flags="$flags --enable-ffmpeg --enable-zlib --enable-small --optflags=-O2"
@@ -52,3 +55,13 @@ Enable pcm_alaw      y y n y n
 Enable pcm_mulaw     y y n y n
 
 ./configure --extra-ldflags=$ldflags $flags
+
+make
+
+dirName=$1
+if [ $dirName == "x86_64" ]; then
+  dirName="x64"
+fi
+
+cd "D:/FFmpeg/build"
+./copy_ffmpeg.bat $dirName
