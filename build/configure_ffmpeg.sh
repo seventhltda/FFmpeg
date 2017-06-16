@@ -7,7 +7,8 @@ make clean
 ldflags="-static"
 
 flags="--disable-everything --disable-debug --pkg-config=pkg-config"
-flags="$flags --enable-ffmpeg --enable-zlib --enable-small --optflags=-O2"
+flags="$flags --enable-ffmpeg --enable-ffplay"
+flags="$flags --enable-zlib --enable-small --optflags=-O2"
 flags="$flags --enable-yasm --enable-asm --enable-hwaccels"
 flags="$flags --enable-shared --enable-memalign-hack"
 flags="$flags --enable-gpl --enable-nonfree"
@@ -64,4 +65,8 @@ if [ $dirName == "x86_64" ]; then
 fi
 
 cd "D:/FFmpeg/build"
-./copy_ffmpeg.bat $dirName
+if [ -z "$2" ]; then
+  ./copy_ffmpeg.bat $dirName
+else
+  ./copy_ffmpeg.bat $dirName $2
+fi
