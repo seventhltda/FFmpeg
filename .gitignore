@@ -33,3 +33,5 @@
 /lcov/
 /src
 /mapfile
+
+build/3.2.2/*
