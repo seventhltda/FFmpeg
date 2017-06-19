@@ -95,4 +95,4 @@
 /tools/seek_print
 /tools/uncoded_frame
 /tools/zmqsend
-build/x*/*
+build/3.0.2/*

@@ -10,7 +10,7 @@ net use "%destDir%" seventh /user:jenkins
 goto BUILD
 
 :LOCAL
-set destDir=D:\FFmpeg\build
+set destDir=D:\FFmpeg\build\3.0.2
 
 :BUILD
 rd /s /q %destDir%\%1%\
