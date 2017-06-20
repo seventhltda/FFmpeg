@@ -93,6 +93,7 @@ Enable adpcm_ct      n y n n n
 Enable adpcm_g726    n y n n n
 Enable adpcm_ima_apc n y n n n
 Enable h264          n y y y y
+Enable hevc          n y y y y
 Enable libmp3lame    y n n n n
 Enable m4v           n n y y n
 Enable mjpeg         n y y y y
