@@ -1684,9 +1684,13 @@ static int h264_slice_header_parse(const H264Context *h, H264SliceContext *sl,
     }
     if ((pps->weighted_pred && sl->slice_type_nos == AV_PICTURE_TYPE_P) ||
         (pps->weighted_bipred_idc == 1 &&
-         sl->slice_type_nos == AV_PICTURE_TYPE_B))
-        ff_h264_pred_weight_table(&sl->gb, sps, sl->ref_count,
-                                  sl->slice_type_nos, &sl->pwt, h->avctx);
+         sl->slice_type_nos == AV_PICTURE_TYPE_B)) {
+        ret = ff_h264_pred_weight_table(&sl->gb, sps, sl->ref_count,
+                                  sl->slice_type_nos, &sl->pwt,
+                                  picture_structure, h->avctx);
+        if (ret < 0)
+            return ret;
+    }
 
     sl->explicit_ref_marking = 0;
     if (nal->ref_idc) {
@@ -1771,8 +1775,10 @@ int ff_h264_decode_slice_header(H264Context *h, H264SliceContext *sl,
         return ret;
 
     // discard redundant pictures
-    if (sl->redundant_pic_count > 0)
+    if (sl->redundant_pic_count > 0) {
+        sl->ref_count[0] = sl->ref_count[1] = 0;
         return 0;
+    }
 
     if (sl->first_mb_addr == 0 || !h->current_slice) {
         if (h->setup_finished) {

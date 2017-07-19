@@ -1098,6 +1098,9 @@ static int read_gab2_sub(AVFormatContext *s, AVStream *st, AVPacket *pkt)
         if (!sub_demuxer)
             goto error;
 
+        if (strcmp(sub_demuxer->name, "srt") && strcmp(sub_demuxer->name, "ass"))
+            goto error;
+
         if (!(ast->sub_ctx = avformat_alloc_context()))
             goto error;
 
@@ -1203,7 +1206,8 @@ start_sync:
         if ((d[0] == 'i' && d[1] == 'x' && n < s->nb_streams) ||
             // parse JUNK
             (d[0] == 'J' && d[1] == 'U' && d[2] == 'N' && d[3] == 'K') ||
-            (d[0] == 'i' && d[1] == 'd' && d[2] == 'x' && d[3] == '1')) {
+            (d[0] == 'i' && d[1] == 'd' && d[2] == 'x' && d[3] == '1') ||
+            (d[0] == 'i' && d[1] == 'n' && d[2] == 'd' && d[3] == 'x')) {
             avio_skip(pb, size);
             goto start_sync;
         }
