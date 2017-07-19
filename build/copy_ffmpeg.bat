@@ -27,6 +27,7 @@ copy libswresample\swresample-2.dll %destDir%\%1%\
 copy libswscale\swscale-4.dll %destDir%\%1%\
 copy ffmpeg.exe %destDir%\%1%\
 copy ffplay.exe %destDir%\%1%\
+copy ffprobe.exe %destDir%\%1%\
 popd
 
 pushd D:\FFmpeg\build

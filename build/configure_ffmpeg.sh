@@ -6,12 +6,12 @@ make clean
 
 ldflags="-static"
 
-flags="--disable-everything --disable-debug --pkg-config=pkg-config"
-flags="$flags --enable-ffmpeg --enable-ffplay"
+flags="--disable-everything --disable-debug --disable-network"
+flags="$flags --pkg-config=pkg-config --enable-ffmpeg --enable-ffplay"
 flags="$flags --enable-zlib --enable-small --optflags=-O2"
 flags="$flags --enable-yasm --enable-asm --enable-hwaccels"
 flags="$flags --enable-shared --enable-memalign-hack"
-flags="$flags --enable-gpl --enable-nonfree"
+flags="$flags --enable-gpl --enable-nonfree --enable-protocol=file"
 flags="$flags --enable-cross-compile --arch=$1 --target-os=mingw32"
 
 function Enable {
@@ -38,21 +38,21 @@ function Enable {
 
 # Format - (E)ncoder, (D)ecoder, (M)uxer, Demu(X)er, (P)arser
 #      Format        E D M X P
-Enable aac           y y n y n
+Enable aac           y y n y y
 Enable adpcm_ct      n y n n n
 Enable adpcm_g726    y y n n n
 Enable adpcm_ima_apc n y n n n
-Enable h264          n y n y n
+Enable h264          n y n y y
 Enable hevc          n y n y y
 Enable m4v           n n n y n
-Enable mjpeg         n y n y n
+Enable mjpeg         n y n y y
 Enable mpeg1video    n y n n n
 Enable mpeg2video    n y n n n
 Enable mpeg4         n y n n n
 Enable mpegps        n n n y n
 Enable mpegts        n n n y n
 Enable mpegtsraw     n n n y n
-Enable mpegvideo     n y n y n
+Enable mpegvideo     n y n y y
 Enable pcm_alaw      y y n y n
 Enable pcm_mulaw     y y n y n
 
