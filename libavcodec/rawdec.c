@@ -223,8 +223,9 @@ static int raw_decode(AVCodecContext *avctx, void *data, int *got_frame,
     }
     desc = av_pix_fmt_desc_get(avctx->pix_fmt);
 
-    if ((avctx->bits_per_coded_sample == 8 || avctx->bits_per_coded_sample == 4
-            || avctx->bits_per_coded_sample <= 2) &&
+    if ((avctx->bits_per_coded_sample == 8 || avctx->bits_per_coded_sample == 4 ||
+         avctx->bits_per_coded_sample == 2 || avctx->bits_per_coded_sample == 1 ||
+         (avctx->bits_per_coded_sample == 0 && (context->is_nut_pal8 || context->is_mono)) ) &&
         (context->is_mono || context->is_pal8) &&
         (!avctx->codec_tag || avctx->codec_tag == MKTAG('r','a','w',' ') ||
                 context->is_nut_mono || context->is_nut_pal8)) {
@@ -382,8 +383,13 @@ static int raw_decode(AVCodecContext *avctx, void *data, int *got_frame,
     }
 
     if (avctx->pix_fmt == AV_PIX_FMT_PAL8) {
+        int pal_size;
         const uint8_t *pal = av_packet_get_side_data(avpkt, AV_PKT_DATA_PALETTE,
-                                                     NULL);
+                                                     &pal_size);
+        if (pal && pal_size != AVPALETTE_SIZE) {
+            av_log(avctx, AV_LOG_ERROR, "Palette size %d is wrong\n", pal_size);
+            pal = NULL;
+        }
 
         if (pal) {
             av_buffer_unref(&context->palette);

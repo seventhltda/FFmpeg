@@ -2701,8 +2701,10 @@ static int http_receive_data(HTTPContext *c)
         } else if (c->buffer_ptr - c->buffer >= 2 &&
                    !memcmp(c->buffer_ptr - 1, "\r\n", 2)) {
             c->chunk_size = strtol(c->buffer, 0, 16);
-            if (c->chunk_size == 0) // end of stream
+            if (c->chunk_size <= 0) { // end of stream or invalid chunk size
+                c->chunk_size = 0;
                 goto fail;
+            }
             c->buffer_ptr = c->buffer;
             break;
         } else if (++loop_run > 10)
@@ -2724,6 +2726,7 @@ static int http_receive_data(HTTPContext *c)
             /* end of connection : close it */
             goto fail;
         else {
+            av_assert0(len <= c->chunk_size);
             c->chunk_size -= len;
             c->buffer_ptr += len;
             c->data_count += len;
@@ -3858,6 +3861,8 @@ drop:
             if (avformat_write_header(s, NULL) < 0) {
                 http_log("Container doesn't support the required parameters\n");
                 avio_closep(&s->pb);
+                s->streams = NULL;
+                s->nb_streams = 0;
                 avformat_free_context(s);
                 goto bail;
             }
@@ -3973,6 +3978,7 @@ int main(int argc, char **argv)
     int cfg_parsed;
     int ret = EXIT_FAILURE;
 
+    init_dynload();
 
     config.filename = av_strdup("/etc/ffserver.conf");
 

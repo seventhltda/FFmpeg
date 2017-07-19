@@ -27,6 +27,7 @@
 #include "libavutil/opt.h"
 #include "libavutil/avassert.h"
 #include "libavutil/avstring.h"
+#include "libavutil/pixdesc.h"
 #include "avformat.h"
 #include "internal.h"
 #include "ffm.h"
@@ -361,7 +362,7 @@ static int ffm2_read_header(AVFormatContext *s)
             }
             break;
         case MKBETAG('S', 'T', 'V', 'I'):
-            if (f_stvi++) {
+            if (f_stvi++ || codec->codec_type != AVMEDIA_TYPE_VIDEO) {
                 ret = AVERROR(EINVAL);
                 goto fail;
             }
@@ -377,6 +378,11 @@ static int ffm2_read_header(AVFormatContext *s)
             codec->height = avio_rb16(pb);
             codec->gop_size = avio_rb16(pb);
             codec->pix_fmt = avio_rb32(pb);
+            if (!av_pix_fmt_desc_get(codec->pix_fmt)) {
+                av_log(s, AV_LOG_ERROR, "Invalid pix fmt id: %d\n", codec->pix_fmt);
+                codec->pix_fmt = AV_PIX_FMT_NONE;
+                goto fail;
+            }
             codec->qmin = avio_r8(pb);
             codec->qmax = avio_r8(pb);
             codec->max_qdiff = avio_r8(pb);
@@ -417,7 +423,7 @@ static int ffm2_read_header(AVFormatContext *s)
             codec->refs = avio_rb32(pb);
             break;
         case MKBETAG('S', 'T', 'A', 'U'):
-            if (f_stau++) {
+            if (f_stau++ || codec->codec_type != AVMEDIA_TYPE_AUDIO) {
                 ret = AVERROR(EINVAL);
                 goto fail;
             }
@@ -443,7 +449,7 @@ static int ffm2_read_header(AVFormatContext *s)
             }
             break;
         case MKBETAG('S', '2', 'V', 'I'):
-            if (f_stvi++ || !size) {
+            if (f_stvi++ || !size || codec->codec_type != AVMEDIA_TYPE_VIDEO) {
                 ret = AVERROR(EINVAL);
                 goto fail;
             }
@@ -458,7 +464,7 @@ static int ffm2_read_header(AVFormatContext *s)
                 goto fail;
             break;
         case MKBETAG('S', '2', 'A', 'U'):
-            if (f_stau++ || !size) {
+            if (f_stau++ || !size || codec->codec_type != AVMEDIA_TYPE_AUDIO) {
                 ret = AVERROR(EINVAL);
                 goto fail;
             }
@@ -569,6 +575,11 @@ static int ffm_read_header(AVFormatContext *s)
             codec->height = avio_rb16(pb);
             codec->gop_size = avio_rb16(pb);
             codec->pix_fmt = avio_rb32(pb);
+            if (!av_pix_fmt_desc_get(codec->pix_fmt)) {
+                av_log(s, AV_LOG_ERROR, "Invalid pix fmt id: %d\n", codec->pix_fmt);
+                codec->pix_fmt = AV_PIX_FMT_NONE;
+                goto fail;
+            }
             codec->qmin = avio_r8(pb);
             codec->qmax = avio_r8(pb);
             codec->max_qdiff = avio_r8(pb);

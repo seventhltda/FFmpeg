@@ -903,8 +903,8 @@ static int decode_lowdelay(DiracContext *s)
     } else {
         for (slice_y = 0; bufsize > 0 && slice_y < s->num_y; slice_y++) {
             for (slice_x = 0; bufsize > 0 && slice_x < s->num_x; slice_x++) {
-                bytes = (slice_num+1) * s->lowdelay.bytes.num / s->lowdelay.bytes.den
-                    - slice_num    * s->lowdelay.bytes.num / s->lowdelay.bytes.den;
+                bytes = (slice_num+1) * (int64_t)s->lowdelay.bytes.num / s->lowdelay.bytes.den
+                       - slice_num    * (int64_t)s->lowdelay.bytes.num / s->lowdelay.bytes.den;
                 slices[slice_num].bytes   = bytes;
                 slices[slice_num].slice_x = slice_x;
                 slices[slice_num].slice_y = slice_y;
@@ -1153,6 +1153,11 @@ static int dirac_unpack_idwt_params(DiracContext *s)
     else {
         s->num_x        = svq3_get_ue_golomb(gb);
         s->num_y        = svq3_get_ue_golomb(gb);
+        if (s->num_x * s->num_y == 0 || s->num_x * (uint64_t)s->num_y > INT_MAX) {
+            av_log(s->avctx,AV_LOG_ERROR,"Invalid numx/y\n");
+            s->num_x = s->num_y = 0;
+            return AVERROR_INVALIDDATA;
+        }
         if (s->ld_picture) {
             s->lowdelay.bytes.num = svq3_get_ue_golomb(gb);
             s->lowdelay.bytes.den = svq3_get_ue_golomb(gb);
@@ -1895,7 +1900,9 @@ static int dirac_decode_picture_header(DiracContext *s)
             for (j = 0; j < MAX_FRAMES; j++)
                 if (!s->all_frames[j].avframe->data[0]) {
                     s->ref_pics[i] = &s->all_frames[j];
-                    get_buffer_with_edge(s->avctx, s->ref_pics[i]->avframe, AV_GET_BUFFER_FLAG_REF);
+                    ret = get_buffer_with_edge(s->avctx, s->ref_pics[i]->avframe, AV_GET_BUFFER_FLAG_REF);
+                    if (ret < 0)
+                        return ret;
                     break;
                 }
 
@@ -1959,9 +1966,9 @@ static int get_delayed_pic(DiracContext *s, AVFrame *picture, int *got_frame)
 
     if (out) {
         out->reference ^= DELAYED_PIC_REF;
-        *got_frame = 1;
         if((ret = av_frame_ref(picture, out->avframe)) < 0)
             return ret;
+        *got_frame = 1;
     }
 
     return 0;

@@ -344,14 +344,14 @@ static void avi_metadata_creation_time(AVDictionary **metadata, char *date)
 
 static void avi_read_nikon(AVFormatContext *s, uint64_t end)
 {
-    while (avio_tell(s->pb) < end) {
+    while (avio_tell(s->pb) < end && !avio_feof(s->pb)) {
         uint32_t tag  = avio_rl32(s->pb);
         uint32_t size = avio_rl32(s->pb);
         switch (tag) {
         case MKTAG('n', 'c', 't', 'g'):  /* Nikon Tags */
         {
             uint64_t tag_end = avio_tell(s->pb) + size;
-            while (avio_tell(s->pb) < tag_end) {
+            while (avio_tell(s->pb) < tag_end && !avio_feof(s->pb)) {
                 uint16_t tag     = avio_rl16(s->pb);
                 uint16_t size    = avio_rl16(s->pb);
                 const char *name = NULL;
@@ -608,6 +608,7 @@ static int avi_read_header(AVFormatContext *s)
                 if (s->streams[0]->info)
                     av_freep(&s->streams[0]->info->duration_error);
                 av_freep(&s->streams[0]->info);
+                av_freep(&s->streams[0]->internal);
                 av_freep(&s->streams[0]);
                 s->nb_streams = 0;
                 if (CONFIG_DV_DEMUXER) {
@@ -1084,6 +1085,9 @@ static int read_gab2_sub(AVFormatContext *s, AVStream *st, AVPacket *pkt)
         if (!sub_demuxer)
             goto error;
 
+        if (strcmp(sub_demuxer->name, "srt") && strcmp(sub_demuxer->name, "ass"))
+            goto error;
+
         if (!(ast->sub_ctx = avformat_alloc_context()))
             goto error;
 
@@ -1093,6 +1097,8 @@ static int read_gab2_sub(AVFormatContext *s, AVStream *st, AVPacket *pkt)
             goto error;
 
         if (!avformat_open_input(&ast->sub_ctx, "", sub_demuxer, NULL)) {
+            if (ast->sub_ctx->nb_streams != 1)
+                goto error;
             ff_read_packet(ast->sub_ctx, &ast->sub_pkt);
             *st->codec = *ast->sub_ctx->streams[0]->codec;
             ast->sub_ctx->streams[0]->codec->extradata = NULL;
@@ -1188,7 +1194,8 @@ start_sync:
         if ((d[0] == 'i' && d[1] == 'x' && n < s->nb_streams) ||
             // parse JUNK
             (d[0] == 'J' && d[1] == 'U' && d[2] == 'N' && d[3] == 'K') ||
-            (d[0] == 'i' && d[1] == 'd' && d[2] == 'x' && d[3] == '1')) {
+            (d[0] == 'i' && d[1] == 'd' && d[2] == 'x' && d[3] == '1') ||
+            (d[0] == 'i' && d[1] == 'n' && d[2] == 'd' && d[3] == 'x')) {
             avio_skip(pb, size);
             goto start_sync;
         }
@@ -1695,6 +1702,8 @@ static int guess_ni_flag(AVFormatContext *s)
             size = avio_rl32(s->pb);
             if (get_stream_idx(tag) == i && pos + size > st->index_entries[1].pos)
                 last_start = INT64_MAX;
+            if (get_stream_idx(tag) == i && size == st->index_entries[0].size + 8)
+                last_start = INT64_MAX;
         }
 
         if (st->index_entries[0].pos > last_start)
@@ -1843,7 +1852,6 @@ static int avi_read_seek(AVFormatContext *s, int stream_index,
             continue;
 
 //        av_assert1(st2->codec->block_align);
-        av_assert0(fabs(av_q2d(st2->time_base) - ast2->scale / (double)ast2->rate) < av_q2d(st2->time_base) * 0.00000001);
         index = av_index_search_timestamp(st2,
                                           av_rescale_q(timestamp,
                                                        st->time_base,

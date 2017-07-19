@@ -184,6 +184,12 @@ static int rscc_decode_frame(AVCodecContext *avctx, void *data,
         ctx->tiles[i].y = bytestream2_get_le16(gbc);
         ctx->tiles[i].h = bytestream2_get_le16(gbc);
 
+        if (pixel_size + ctx->tiles[i].w * (int64_t)ctx->tiles[i].h * 4 > INT_MAX) {
+            av_log(avctx, AV_LOG_ERROR, "Invalid tile dimensions\n");
+            ret = AVERROR_INVALIDDATA;
+            goto end;
+        }
+
         pixel_size += ctx->tiles[i].w * ctx->tiles[i].h * 4;
 
         ff_dlog(avctx, "tile %d orig(%d,%d) %dx%d.\n", i,
@@ -223,6 +229,12 @@ static int rscc_decode_frame(AVCodecContext *avctx, void *data,
 
     ff_dlog(avctx, "pixel_size %d packed_size %d.\n", pixel_size, packed_size);
 
+    if (packed_size < 0) {
+        av_log(avctx, AV_LOG_ERROR, "Invalid tile size %d\n", packed_size);
+        ret = AVERROR_INVALIDDATA;
+        goto end;
+    }
+
     /* Get pixels buffer, it may be deflated or just raw */
     if (pixel_size == packed_size) {
         if (bytestream2_get_bytes_left(gbc) < pixel_size) {
@@ -233,6 +245,11 @@ static int rscc_decode_frame(AVCodecContext *avctx, void *data,
         pixels = gbc->buffer;
     } else {
         uLongf len = ctx->inflated_size;
+        if (bytestream2_get_bytes_left(gbc) < packed_size) {
+            av_log(avctx, AV_LOG_ERROR, "Insufficient input for %d\n", packed_size);
+            ret = AVERROR_INVALIDDATA;
+            goto end;
+        }
         ret = uncompress(ctx->inflated_buf, &len, gbc->buffer, packed_size);
         if (ret) {
             av_log(avctx, AV_LOG_ERROR, "Pixel deflate error %d.\n", ret);
