@@ -78,7 +78,7 @@ make distclean
 make clean
 
 if [ $1 = x86 ]; then
-  ldflags="-static -L/c/msys64/mingw32/i686-w64-mingw32"
+  ldflags="-static -L/c/msys64/mingw32/i686-w64-mingw32/lib"
 fi
 
 if [ $1 = x86_64 ]; then
@@ -94,7 +94,7 @@ flags="$flags --enable-gpl --enable-nonfree --enable-libx264 --enable-libmp3lame
 flags="$flags --enable-protocol=concat --enable-protocol=file"
 flags="$flags --enable-filter=color --enable-filter=smptebars --enable-filter=testsrc --enable-filter=nullsrc"
 flags="$flags --enable-filter=anullsrc --enable-filter=anoisesrc --enable-filter=aevalsrc"
-flags="$flags --enable-filter=fps --enable-filter=subtitles --enable-filter=aresample"
+flags="$flags --enable-filter=concat --enable-filter=fps --enable-filter=subtitles --enable-filter=aresample"
 flags="$flags --enable-indev=lavfi"
 flags="$flags --enable-bsf=h264_mp4toannexb --enable-bsf=hevc_mp4toannexb"
 flags="$flags --enable-cross-compile --arch=$1 --target-os=mingw32"
@@ -128,6 +128,7 @@ Enable ac3           y y y y y
 Enable adpcm_ct      n y n n n
 Enable adpcm_g726    n y n n n
 Enable adpcm_ima_apc n y n n n
+Enable concat        n n n y n
 Enable h264          n y y y y
 Enable libx264       y n n n n
 Enable hevc          n y y y y
