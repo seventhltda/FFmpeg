@@ -91,7 +91,7 @@ flags="$flags --enable-zlib --enable-small --optflags=-O2"
 flags="$flags --enable-yasm --enable-asm --enable-hwaccels"
 flags="$flags --enable-shared --enable-memalign-hack"
 flags="$flags --enable-gpl --enable-nonfree --enable-libx264 --enable-libmp3lame"
-flags="$flags --enable-protocol=concat --enable-protocol=file"
+flags="$flags --enable-protocol=concat --enable-protocol=file --enable-protocol=rtp"
 flags="$flags --enable-filter=color --enable-filter=smptebars --enable-filter=testsrc --enable-filter=nullsrc"
 flags="$flags --enable-filter=anullsrc --enable-filter=anoisesrc --enable-filter=aevalsrc"
 flags="$flags --enable-filter=concat --enable-filter=fps --enable-filter=subtitles --enable-filter=aresample"
@@ -129,6 +129,7 @@ Enable adpcm_ct      n y n n n
 Enable adpcm_g726    n y n n n
 Enable adpcm_ima_apc n y n n n
 Enable concat        n n n y n
+Enable dash          n n y n n
 Enable h264          n y y y y
 Enable libx264       y n n n n
 Enable hevc          n y y y y
@@ -146,6 +147,7 @@ Enable pcm_mulaw     n y n y n
 Enable pcm_u8        y y y y n
 Enable png           y y n n y
 Enable rawvideo      y y y y n
+Enable rtsp          n n y y n
 Enable srt           y y y y n
 Enable subrip        y y n n n
 
