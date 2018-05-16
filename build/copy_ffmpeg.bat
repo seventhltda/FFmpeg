@@ -5,12 +5,12 @@ if "%2%" == "" goto REMOTE
 if "%2%" == "local" goto LOCAL
 
 :REMOTE
-set destDir=\\192.168.0.6\Releases\FFmpeg\3.0.2
+set destDir=\\192.168.0.6\Releases\FFmpeg\3.3.5
 net use "%destDir%" seventh /user:jenkins
 goto BUILD
 
 :LOCAL
-set destDir=D:\FFmpeg\build\3.0.2
+set destDir=D:\FFmpeg\build\3.3.5
 
 :BUILD
 rd /s /q %destDir%\%1%\
