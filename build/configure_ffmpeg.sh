@@ -8,7 +8,7 @@ ldflags="-static"
 
 flags="--disable-everything --disable-debug --disable-network"
 flags="$flags --pkg-config=pkg-config --enable-ffmpeg --enable-ffplay"
-flags="$flags --enable-zlib --enable-small --optflags=-O2"
+flags="$flags --enable-small --optflags=-O2"
 flags="$flags --enable-yasm --enable-asm --enable-hwaccels"
 flags="$flags --enable-shared"
 flags="$flags --enable-gpl --enable-nonfree --enable-protocol=file"
