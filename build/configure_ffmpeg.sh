@@ -10,7 +10,7 @@ flags="--disable-everything --disable-debug --disable-network"
 flags="$flags --pkg-config=pkg-config --enable-ffmpeg --enable-ffplay"
 flags="$flags --enable-zlib --enable-small --optflags=-O2"
 flags="$flags --enable-yasm --enable-asm --enable-hwaccels"
-flags="$flags --enable-shared --enable-memalign-hack"
+flags="$flags --enable-shared"
 flags="$flags --enable-gpl --enable-nonfree --enable-protocol=file"
 flags="$flags --enable-cross-compile --arch=$1 --target-os=mingw32"
 
