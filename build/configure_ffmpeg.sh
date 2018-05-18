@@ -69,6 +69,7 @@ Enable mp3           n y y y n
 Enable mp4           n n y n n
 Enable mpeg4         n y n n n
 Enable mov           n n y y n
+Enable on2avc        n y n n n
 Enable pcm_alaw      y y n y n
 Enable pcm_mulaw     y y n y n
 Enable pcm_u8        y y y y n
