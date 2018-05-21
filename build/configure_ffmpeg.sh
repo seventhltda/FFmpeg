@@ -10,14 +10,14 @@ flags="--disable-everything --disable-debug --pkg-config=pkg-config"
 flags="$flags --enable-ffmpeg --enable-ffplay"
 flags="$flags --enable-zlib --enable-small --optflags=-O2"
 flags="$flags --enable-yasm --enable-asm --enable-hwaccels"
-flags="$flags --enable-shared"
+flags="$flags --enable-shared --enable-static"
 flags="$flags --enable-gpl --enable-nonfree --enable-libx264 --enable-libmp3lame"
 flags="$flags --enable-protocol=concat --enable-protocol=file --enable-protocol=rtp"
 flags="$flags --enable-filter=color --enable-filter=smptebars --enable-filter=testsrc --enable-filter=nullsrc"
 flags="$flags --enable-filter=anullsrc --enable-filter=anoisesrc --enable-filter=aevalsrc"
 flags="$flags --enable-filter=concat --enable-filter=fps --enable-filter=subtitles --enable-filter=aresample"
 flags="$flags --enable-indev=lavfi"
-flags="$flags --enable-bsf=h264_mp4toannexb --enable-bsf=hevc_mp4toannexb"
+flags="$flags --enable-bsf=h264_mp4toannexb --enable-bsf=hevc_mp4toannexb --enable-bsf=extract_extradata"
 flags="$flags --enable-cross-compile --arch=$1 --target-os=mingw32"
 
 function Enable {
@@ -57,21 +57,21 @@ Enable hevc          n y y y y
 Enable libmp3lame    y n n n n
 Enable m4v           n n y y n
 Enable mjpeg         y y y y y
-Enable mpeg1video    n y n n n
-Enable mpeg2video    n y n n n
-Enable mpeg4         n y n n n
+Enable mpeg1video    y y n n n
+Enable mpeg2video    y y n n n
+Enable mpeg4         y y n n n
 Enable mpegps        n n n y n
 Enable mpegts        n n y y n
 Enable mpegtsraw     n n n y n
 Enable mpegvideo     n y n y y
-Enable movtext       y y n n n
+Enable mp2           n y y n n
 Enable mp3           n y y y n
 Enable mp4           n n y n n
-Enable mpeg4         n y n n n
+Enable mpeg4         y y n n n
 Enable mov           n n y y n
 Enable on2avc        n y n n n
-Enable pcm_alaw      y y n y n
-Enable pcm_mulaw     y y n y n
+Enable pcm_alaw      y y y y n
+Enable pcm_mulaw     y y y y n
 Enable pcm_u8        y y y y n
 Enable png           y y n n y
 Enable rawvideo      y y y y n
